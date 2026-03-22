@@ -139,13 +139,25 @@ async function updateLeaderboard() {
     leaderboardList.innerHTML = leaderboard.map((item, index) => `
       <li class="leaderboard-item ${index < 3 ? 'top-3' : ''}">
         <span class="rank rank-${index + 1}">${index + 1}</span>
-        <span class="username">${escapeHtml(item.username)}</span>
+        <span class="username">${maskUsername(item.username)}</span>
         <span class="score">${item.score}</span>
       </li>
     `).join('');
   } catch (error) {
     console.error('获取排行榜失败:', error);
   }
+}
+
+// 用户名脱敏（保护隐私）
+function maskUsername(username) {
+  if (username.length <= 4) {
+    return username[0] + '***';
+  }
+  const start = username.slice(0, 2);
+  const end = username.slice(-2);
+  const maskCount = Math.min(username.length - 4, 4);
+  const mask = '*'.repeat(maskCount);
+  return start + mask + end;
 }
 
 // HTML 转义防止 XSS
@@ -309,25 +321,70 @@ async function gameOver() {
   gameRunning = false;
   clearInterval(gameLoop);
 
-  // 显示最终分数
-  document.getElementById('final-score').textContent = score;
-  document.getElementById('game-over-modal').classList.add('show');
-
   // 提交分数
   if (currentUser) {
     try {
       const username = getUsernameFromEmail(currentUser.email);
       await submitScore(currentUser.id, username, score);
+
+      // 检查排名
+      const rank = await checkUserRank(currentUser.id);
       await updateLeaderboard();
+
+      if (rank && rank <= 3) {
+        // 进入前三，显示恭喜弹窗
+        document.getElementById('congrats-score').textContent = score;
+        document.getElementById('congrats-rank').textContent = `第 ${rank} 名`;
+        document.getElementById('congrats-modal').classList.add('show');
+      } else {
+        // 未进入前三，显示普通结束弹窗
+        document.getElementById('final-score').textContent = score;
+        document.getElementById('game-over-modal').classList.add('show');
+      }
     } catch (error) {
       console.error('提交分数失败:', error);
+      document.getElementById('final-score').textContent = score;
+      document.getElementById('game-over-modal').classList.add('show');
     }
+  } else {
+    document.getElementById('final-score').textContent = score;
+    document.getElementById('game-over-modal').classList.add('show');
   }
+}
+
+// 检查用户排名
+async function checkUserRank(userId) {
+  const { data, error } = await supabase
+    .from('leaderboard')
+    .select('score')
+    .eq('user_id', userId)
+    .order('score', { ascending: false });
+
+  if (error || !data || data.length === 0) return null;
+
+  // 用户可能有多条记录，取最高分对应的排名
+  const userScore = data[0].score;
+
+  const { data: rankData } = await supabase
+    .from('leaderboard')
+    .select('id')
+    .order('score', { ascending: false });
+
+  if (!rankData) return null;
+
+  const index = rankData.findIndex(item => item.id === data[0].id);
+  return index + 1;
 }
 
 // 重新开始游戏
 document.getElementById('restart-btn').addEventListener('click', () => {
   document.getElementById('game-over-modal').classList.remove('show');
+  startGame();
+});
+
+// 恭喜弹窗重新开始游戏
+document.getElementById('congrats-restart-btn').addEventListener('click', () => {
+  document.getElementById('congrats-modal').classList.remove('show');
   startGame();
 });
 
@@ -337,6 +394,10 @@ document.addEventListener('keydown', (e) => {
     if (e.key === ' ' || e.key === 'Enter') {
       if (document.getElementById('game-over-modal').classList.contains('show')) {
         document.getElementById('game-over-modal').classList.remove('show');
+        startGame();
+      } else if (document.getElementById('congrats-modal').classList.contains('show')) {
+        document.getElementById('congrats-modal').classList.remove('show');
+        startGame();
       }
       startGame();
     }
