@@ -10,20 +10,31 @@ export function getUsernameFromEmail(email) {
   return email.split('@')[0];
 }
 
-// 提交分数到排行榜
+// 提交分数到排行榜（只保留最高分）
 export async function submitScore(userId, username, score) {
-  const { data, error } = await supabase
+  // 先查询用户是否已有记录
+  const { data: existing } = await supabase
     .from('leaderboard')
-    .insert([
-      {
-        user_id: userId,
-        username: username,
-        score: score
-      }
-    ]);
+    .select('id, score')
+    .eq('user_id', userId)
+    .single();
 
-  if (error) throw error;
-  return data;
+  if (existing) {
+    // 如果新分数更高，就更新
+    if (score > existing.score) {
+      const { error } = await supabase
+        .from('leaderboard')
+        .update({ score: score, username: username })
+        .eq('user_id', userId);
+      if (error) throw error;
+    }
+  } else {
+    // 没有记录，插入新的
+    const { error } = await supabase
+      .from('leaderboard')
+      .insert([{ user_id: userId, username: username, score: score }]);
+    if (error) throw error;
+  }
 }
 
 // 获取前十排行榜

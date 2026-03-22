@@ -337,17 +337,22 @@ async function gameOver() {
   gameRunning = false;
   clearInterval(gameLoop);
 
-  // 提交分数
   if (currentUser) {
     try {
       const username = getUsernameFromEmail(currentUser.email);
+
+      // 获取用户之前的最高分
+      const previousBest = await getUserBestScore(currentUser.id);
+
+      // 提交分数（只保留最高分）
       await submitScore(currentUser.id, username, score);
       await updateLeaderboard();
 
-      // 检查排名
-      const rank = await getUserRank(currentUser.id, score);
+      // 获取本次游戏的排名
+      const rank = await getUserRank(currentUser.id);
 
-      if (rank && rank <= 3) {
+      // 只有本次分数比之前高，才判断是否进入前三
+      if (score > previousBest && rank && rank <= 3) {
         // 进入前三，显示恭喜弹窗
         document.getElementById('congrats-score').textContent = score;
         document.getElementById('congrats-rank').textContent = `第 ${rank} 名`;
@@ -368,19 +373,30 @@ async function gameOver() {
   }
 }
 
-// 获取用户排名
-async function getUserRank(userId, userScore) {
-  // 获取所有分数，按降序排列
-  const { data: allScores, error } = await supabase
+// 获取用户之前的最高分
+async function getUserBestScore(userId) {
+  const { data, error } = await supabase
     .from('leaderboard')
-    .select('user_id')
+    .select('score')
+    .eq('user_id', userId)
+    .order('score', { ascending: false })
+    .limit(1);
+
+  if (error || !data || data.length === 0) return 0;
+  return data[0].score;
+}
+
+// 获取用户排名
+async function getUserRank(userId) {
+  const { data, error } = await supabase
+    .from('leaderboard')
+    .select('user_id, score')
     .order('score', { ascending: false })
     .limit(10);
 
-  if (error || !allScores) return null;
+  if (error || !data) return null;
 
-  // 找到当前用户的排名
-  const index = allScores.findIndex(item => item.user_id === userId);
+  const index = data.findIndex(item => item.user_id === userId);
   return index === -1 ? null : index + 1;
 }
 
