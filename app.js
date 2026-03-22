@@ -118,6 +118,8 @@ loginForm.addEventListener('submit', async (e) => {
 
   if (error) {
     showMessage('邮箱或密码错误');
+  } else {
+    showGame();
   }
 });
 
