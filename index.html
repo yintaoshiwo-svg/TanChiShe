@@ -75,6 +75,16 @@
 
     <canvas id="game-canvas"></canvas>
 
+    <!-- 虚拟方向键（移动端） -->
+    <div class="dpad">
+      <button class="dpad-btn dpad-up" data-dir="up">▲</button>
+      <div class="dpad-row">
+        <button class="dpad-btn dpad-left" data-dir="left">◀</button>
+        <button class="dpad-btn dpad-down" data-dir="down">▼</button>
+        <button class="dpad-btn dpad-right" data-dir="right">▶</button>
+      </div>
+    </div>
+
     <button id="start-btn" class="btn btn-primary" style="max-width: 200px; margin-top: 20px;">
       开始游戏（按空格也可开始）
     </button>

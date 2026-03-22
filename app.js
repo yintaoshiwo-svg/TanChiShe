@@ -501,6 +501,35 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
+// 虚拟方向键控制（移动端）
+document.querySelectorAll('.dpad-btn').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (!gameRunning) return;
+
+    const dir = btn.dataset.dir;
+    switch (dir) {
+      case 'up':
+        if (direction.y !== 1) nextDirection = { x: 0, y: -1 };
+        break;
+      case 'down':
+        if (direction.y !== -1) nextDirection = { x: 0, y: 1 };
+        break;
+      case 'left':
+        if (direction.x !== 1) nextDirection = { x: -1, y: 0 };
+        break;
+      case 'right':
+        if (direction.x !== -1) nextDirection = { x: 1, y: 0 };
+        break;
+    }
+  });
+
+  // 阻止按钮的默认触摸行为
+  btn.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+  });
+});
+
 // 开始按钮
 document.getElementById('start-btn').addEventListener('click', startGame);
 
