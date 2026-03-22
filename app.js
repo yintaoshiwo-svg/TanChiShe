@@ -50,7 +50,20 @@ function showAuth() {
 function showGame() {
   authContainer.style.display = 'none';
   gameContainer.style.display = 'flex';
+
+  // 显示用户头像
+  if (currentUser) {
+    const avatarUrl = getAvatarUrl(currentUser.email);
+    document.getElementById('user-avatar').src = avatarUrl;
+  }
+
   updateLeaderboard();
+}
+
+// 生成头像 URL（基于邮箱生成固定动物头像）
+function getAvatarUrl(email) {
+  const seed = encodeURIComponent(email);
+  return `https://api.dicebear.com/7.x/adventurer/svg?seed=${seed}`;
 }
 
 // ==================== 表单切换 ====================
@@ -141,6 +154,7 @@ async function updateLeaderboard() {
     leaderboardList.innerHTML = leaderboard.map((item, index) => `
       <li class="leaderboard-item ${index < 3 ? 'top-3' : ''}">
         <span class="rank rank-${index + 1}">${index + 1}</span>
+        <img class="leaderboard-avatar" src="${getAvatarUrl(item.username + '@avatar')}" alt="头像">
         <span class="username">${maskUsername(item.username)}</span>
         <span class="score">${item.score}</span>
       </li>
@@ -414,21 +428,25 @@ document.addEventListener('keydown', (e) => {
     case 'ArrowUp':
     case 'w':
     case 'W':
+      e.preventDefault();
       if (direction.y !== 1) nextDirection = { x: 0, y: -1 };
       break;
     case 'ArrowDown':
     case 's':
     case 'S':
+      e.preventDefault();
       if (direction.y !== -1) nextDirection = { x: 0, y: 1 };
       break;
     case 'ArrowLeft':
     case 'a':
     case 'A':
+      e.preventDefault();
       if (direction.x !== 1) nextDirection = { x: -1, y: 0 };
       break;
     case 'ArrowRight':
     case 'd':
     case 'D':
+      e.preventDefault();
       if (direction.x !== -1) nextDirection = { x: 1, y: 0 };
       break;
   }
