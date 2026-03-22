@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>贪吃蛇 - 经典游戏</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- 认证容器 -->
+  <div id="auth-container" class="container">
+    <div class="card">
+      <h2>🐍 贪吃蛇</h2>
+
+      <!-- 登录表单 -->
+      <form id="login-form">
+        <div class="message"></div>
+
+        <div class="form-group">
+          <label for="login-email">邮箱</label>
+          <input type="email" id="login-email" placeholder="请输入邮箱" required>
+        </div>
+
+        <div class="form-group">
+          <label for="login-password">密码</label>
+          <input type="password" id="login-password" placeholder="请输入密码" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary">登录</button>
+
+        <p class="switch-text">
+          还没有账号？<a id="show-register">立即注册</a>
+        </p>
+      </form>
+
+      <!-- 注册表单 -->
+      <form id="register-form" style="display: none;">
+        <div class="message"></div>
+
+        <div class="form-group">
+          <label for="register-email">邮箱</label>
+          <input type="email" id="register-email" placeholder="请输入邮箱" required>
+        </div>
+
+        <div class="form-group">
+          <label for="register-password">密码</label>
+          <input type="password" id="register-password" placeholder="请输入密码（至少6位）" required>
+        </div>
+
+        <div class="form-group">
+          <label for="register-confirm-password">确认密码</label>
+          <input type="password" id="register-confirm-password" placeholder="请再次输入密码" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary">注册</button>
+
+        <p class="switch-text">
+          已有账号？<a id="show-login">立即登录</a>
+        </p>
+      </form>
+    </div>
+  </div>
+
+  <!-- 游戏容器 -->
+  <div id="game-container" class="container">
+    <div class="game-header">
+      <div class="game-info">
+        <span>得分: <strong id="score">0</strong></span>
+      </div>
+      <button id="logout-btn" class="logout-btn">退出登录</button>
+    </div>
+
+    <canvas id="game-canvas"></canvas>
+
+    <button id="start-btn" class="btn btn-primary" style="max-width: 200px; margin-top: 20px;">
+      开始游戏（按空格也可开始）
+    </button>
+
+    <!-- 排行榜 -->
+    <div class="leaderboard">
+      <h3>🏆 排行榜 TOP 10</h3>
+      <ul id="leaderboard-list" class="leaderboard-list">
+        <li class="no-data">加载中...</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 游戏结束弹窗 -->
+  <div id="game-over-modal" class="modal">
+    <div class="modal-content">
+      <h2>游戏结束</h2>
+      <p>你的得分</p>
+      <div id="final-score" class="final-score">0</div>
+      <button id="restart-btn" class="btn btn-primary">再来一局</button>
+    </div>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
