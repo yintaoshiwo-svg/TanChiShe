@@ -384,11 +384,13 @@ document.getElementById('congrats-restart-btn').addEventListener('click', () => 
 
 // 退出按钮 - 游戏结束弹窗
 document.getElementById('exit-btn').addEventListener('click', () => {
+  console.log('exit-btn clicked');
   document.getElementById('game-over-modal').classList.remove('show');
 });
 
 // 退出按钮 - 恭喜弹窗
 document.getElementById('congrats-exit-btn').addEventListener('click', () => {
+  console.log('congrats-exit-btn clicked');
   document.getElementById('congrats-modal').classList.remove('show');
 });
 
