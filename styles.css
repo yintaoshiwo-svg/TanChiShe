@@ -184,7 +184,7 @@ body {
   width: 100%;
   max-width: 500px;
   position: relative;
-  z-index: 1001;
+  z-index: 1;
 }
 
 .leaderboard h3 {

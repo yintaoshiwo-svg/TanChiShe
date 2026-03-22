@@ -63,7 +63,7 @@ function showGame() {
 // 生成头像 URL（基于邮箱生成固定动物头像）
 function getAvatarUrl(email) {
   const seed = encodeURIComponent(email);
-  return `https://api.dicebear.com/7.x/adventurer/svg?seed=${seed}`;
+  return `https://api.dicebear.com/7.x/adventurer/png?seed=${seed}&backgroundColor=b6e3f4`;
 }
 
 // ==================== 表单切换 ====================
@@ -410,6 +410,11 @@ document.getElementById('congrats-exit-btn').addEventListener('click', () => {
 
 // 键盘控制
 document.addEventListener('keydown', (e) => {
+  // 阻止方向键滚动页面
+  if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(e.key)) {
+    e.preventDefault();
+  }
+
   if (!gameRunning) {
     if (e.key === ' ' || e.key === 'Enter') {
       if (document.getElementById('game-over-modal').classList.contains('show')) {
@@ -428,25 +433,21 @@ document.addEventListener('keydown', (e) => {
     case 'ArrowUp':
     case 'w':
     case 'W':
-      e.preventDefault();
       if (direction.y !== 1) nextDirection = { x: 0, y: -1 };
       break;
     case 'ArrowDown':
     case 's':
     case 'S':
-      e.preventDefault();
       if (direction.y !== -1) nextDirection = { x: 0, y: 1 };
       break;
     case 'ArrowLeft':
     case 'a':
     case 'A':
-      e.preventDefault();
       if (direction.x !== 1) nextDirection = { x: -1, y: 0 };
       break;
     case 'ArrowRight':
     case 'd':
     case 'D':
-      e.preventDefault();
       if (direction.x !== -1) nextDirection = { x: 1, y: 0 };
       break;
   }
