@@ -326,10 +326,10 @@ async function gameOver() {
     try {
       const username = getUsernameFromEmail(currentUser.email);
       await submitScore(currentUser.id, username, score);
+      await updateLeaderboard();
 
       // 检查排名
-      const rank = await checkUserRank(currentUser.id);
-      await updateLeaderboard();
+      const rank = await getUserRank(currentUser.id, score);
 
       if (rank && rank <= 3) {
         // 进入前三，显示恭喜弹窗
@@ -352,28 +352,20 @@ async function gameOver() {
   }
 }
 
-// 检查用户排名
-async function checkUserRank(userId) {
-  const { data, error } = await supabase
+// 获取用户排名
+async function getUserRank(userId, userScore) {
+  // 获取所有分数，按降序排列
+  const { data: allScores, error } = await supabase
     .from('leaderboard')
-    .select('score')
-    .eq('user_id', userId)
-    .order('score', { ascending: false });
+    .select('user_id')
+    .order('score', { ascending: false })
+    .limit(10);
 
-  if (error || !data || data.length === 0) return null;
+  if (error || !allScores) return null;
 
-  // 用户可能有多条记录，取最高分对应的排名
-  const userScore = data[0].score;
-
-  const { data: rankData } = await supabase
-    .from('leaderboard')
-    .select('id')
-    .order('score', { ascending: false });
-
-  if (!rankData) return null;
-
-  const index = rankData.findIndex(item => item.id === data[0].id);
-  return index + 1;
+  // 找到当前用户的排名
+  const index = allScores.findIndex(item => item.user_id === userId);
+  return index === -1 ? null : index + 1;
 }
 
 // 重新开始游戏
@@ -386,6 +378,16 @@ document.getElementById('restart-btn').addEventListener('click', () => {
 document.getElementById('congrats-restart-btn').addEventListener('click', () => {
   document.getElementById('congrats-modal').classList.remove('show');
   startGame();
+});
+
+// 退出按钮 - 游戏结束弹窗
+document.getElementById('exit-btn').addEventListener('click', () => {
+  document.getElementById('game-over-modal').classList.remove('show');
+});
+
+// 退出按钮 - 恭喜弹窗
+document.getElementById('congrats-exit-btn').addEventListener('click', () => {
+  document.getElementById('congrats-modal').classList.remove('show');
 });
 
 // 键盘控制
