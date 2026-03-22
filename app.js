@@ -3,6 +3,7 @@ import { supabase, getUsernameFromEmail, submitScore, getLeaderboard } from './s
 // ==================== 状态管理 ====================
 let currentUser = null;
 let currentSession = null;
+let isGuest = false; // 游客模式
 
 // ==================== DOM 元素 ====================
 const authContainer = document.getElementById('auth-container');
@@ -45,16 +46,27 @@ async function checkAuthState() {
 function showAuth() {
   authContainer.style.display = 'block';
   gameContainer.style.display = 'none';
+  isGuest = false;
 }
 
 function showGame() {
   authContainer.style.display = 'none';
   gameContainer.style.display = 'flex';
 
-  // 显示用户头像
-  if (currentUser) {
-    const avatarUrl = getAvatarUrl(currentUser.email);
-    document.getElementById('user-avatar').src = avatarUrl;
+  const userAvatar = document.getElementById('user-avatar');
+  const logoutBtn = document.getElementById('logout-btn');
+
+  if (isGuest) {
+    // 游客模式
+    userAvatar.style.display = 'none';
+    logoutBtn.textContent = '返回登录';
+    logoutBtn.style.display = 'inline-block';
+  } else if (currentUser) {
+    // 登录用户
+    userAvatar.style.display = 'inline-block';
+    userAvatar.src = getAvatarUrl(currentUser.email);
+    logoutBtn.textContent = '退出登录';
+    logoutBtn.style.display = 'inline-block';
   }
 
   updateLeaderboard();
@@ -130,7 +142,8 @@ loginForm.addEventListener('submit', async (e) => {
   });
 
   if (error) {
-    showMessage('邮箱或密码错误');
+    console.error('登录错误:', error);
+    showMessage(error.message || '邮箱或密码错误');
   } else {
     showGame();
   }
@@ -138,7 +151,19 @@ loginForm.addEventListener('submit', async (e) => {
 
 // ==================== 登出 ====================
 logoutBtn.addEventListener('click', async () => {
-  await supabase.auth.signOut();
+  if (isGuest) {
+    // 游客模式返回登录
+    isGuest = false;
+    showAuth();
+  } else {
+    await supabase.auth.signOut();
+  }
+});
+
+// ==================== 游客试玩 ====================
+document.getElementById('guest-btn').addEventListener('click', () => {
+  isGuest = true;
+  showGame();
 });
 
 // ==================== 更新排行榜 ====================
@@ -336,6 +361,13 @@ function startGame() {
 async function gameOver() {
   gameRunning = false;
   clearInterval(gameLoop);
+
+  // 游客模式不记入排行榜
+  if (isGuest) {
+    document.getElementById('final-score').textContent = score;
+    document.getElementById('game-over-modal').classList.add('show');
+    return;
+  }
 
   if (currentUser) {
     try {

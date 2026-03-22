@@ -98,6 +98,19 @@ body {
   background: rgba(255, 255, 255, 0.2);
 }
 
+.btn-guest {
+  width: 100%;
+  background: rgba(251, 191, 36, 0.2);
+  color: #fbbf24;
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  margin-top: 10px;
+}
+
+.btn-guest:hover {
+  background: rgba(251, 191, 36, 0.3);
+  transform: translateY(-2px);
+}
+
 .switch-text {
   text-align: center;
   margin-top: 20px;
@@ -354,4 +367,137 @@ body {
   border-radius: 50%;
   margin-right: 10px;
   vertical-align: middle;
+}
+
+/* ==================== 移动端适配 ==================== */
+@media screen and (max-width: 520px) {
+  body {
+    padding: 10px;
+    overflow-x: hidden;
+  }
+
+  .container {
+    padding: 10px;
+  }
+
+  .card {
+    padding: 20px;
+    border-radius: 12px;
+  }
+
+  .card h2 {
+    font-size: 22px;
+    margin-bottom: 20px;
+  }
+
+  /* 游戏容器适配 */
+  #game-container {
+    gap: 10px;
+  }
+
+  .game-header {
+    flex-direction: column;
+    gap: 10px;
+    padding: 5px 0;
+  }
+
+  .game-info {
+    gap: 20px;
+  }
+
+  .game-info span {
+    font-size: 16px;
+  }
+
+  /* Canvas 适配 - 缩小到屏幕宽度内 */
+  #game-canvas {
+    max-width: calc(100vw - 40px);
+    height: auto;
+  }
+
+  /* 排行榜适配 */
+  .leaderboard {
+    margin-top: 20px;
+  }
+
+  .leaderboard h3 {
+    font-size: 20px;
+  }
+
+  .leaderboard-list {
+    border-radius: 8px;
+  }
+
+  .leaderboard-item {
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+
+  .rank {
+    font-size: 14px;
+    width: 30px;
+  }
+
+  .username {
+    flex: 1;
+    font-size: 13px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 80px;
+  }
+
+  .score {
+    font-size: 14px;
+    min-width: 40px;
+    text-align: right;
+  }
+
+  .leaderboard-avatar {
+    width: 24px;
+    height: 24px;
+    margin-right: 6px;
+  }
+
+  /* 按钮适配 */
+  .btn {
+    padding: 10px 16px;
+    font-size: 14px;
+    margin: 5px;
+  }
+
+  /* 弹窗适配 */
+  .modal-content {
+    padding: 25px 20px;
+    max-width: 95%;
+  }
+
+  .modal-content h2 {
+    font-size: 20px;
+  }
+
+  .modal-content .final-score {
+    font-size: 36px;
+  }
+
+  .congrats-content h2 {
+    font-size: 22px;
+  }
+
+  /* 登录注册表单 */
+  .form-group input {
+    padding: 10px;
+    font-size: 14px;
+  }
+
+  /* 用户头像 */
+  #user-avatar {
+    width: 32px;
+    height: 32px;
+  }
+
+  /* 排行榜前三名样式 */
+  .leaderboard-item.top-3 {
+    padding: 12px 15px;
+  }
 }
